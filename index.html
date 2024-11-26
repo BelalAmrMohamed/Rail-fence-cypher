@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rail fence cypher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #282c34;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label, input {
+            display: block;
+            margin: 10px auto;
+            font-size: 1rem;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 50%;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result, .matrix {
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #cccccc;
+        }
+        .matrix-table {
+            margin: 10px auto;
+            border-collapse: collapse;
+        }
+        .matrix-table td {
+            padding: 10px;
+            border: 1px solid #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rail fence cypher</h1>
+    <form id="cipherForm">
+        <label for="word">Enter a word:</label>
+        <input type="text" id="word" required>
+
+        <button type="button" onclick="encryptWord()">Encrypt</button>
+        <button type="button" onclick="decryptWord()">Decrypt</button>
+    </form>
+
+    <div class="matrix" id="matrix"></div>
+    <div class="result" id="result"></div>
+    <div class="footer">Developed by Belal Amr</div>
+
+    <script>
+        function createMatrix(word) {
+    const depth = 2;
+    const length = Math.ceil(word.length / 2);
+    const matrix = Array.from({ length: depth }, () => Array(length).fill(''));
+    let row = 0, col = 0;
+
+    for (let i = 0; i < word.length; i++) {
+        matrix[row][col] = word[i];
+        row = (row + 1) % depth;
+        if (row === 0) col++;
+    }
+
+    displayMatrix(matrix);
+    return matrix;
+}
+
+function displayMatrix(matrix) {
+    const matrixDiv = document.getElementById('matrix');
+    let tableHTML = '<table class="matrix-table">';
+    for (let row of matrix) {
+        tableHTML += '<tr>';
+        for (let cell of row) {
+            tableHTML += `<td>${cell || ''}</td>`;
+        }
+        tableHTML += '</tr>';
+    }
+    tableHTML += '</table>';
+    matrixDiv.innerHTML = `<h3>Matrix:</h3>${tableHTML}`;
+}
+
+function cipherWord(word) {
+    const matrix = createMatrix(word);
+    let cipheredWord = '';
+    for (let col = 0; col < matrix[0].length; col++) {
+        cipheredWord += matrix[0][col] || '';
+    }
+    for (let col = 0; col < matrix[0].length; col++) {
+        cipheredWord += matrix[1][col] || '';
+    }
+    return cipheredWord;
+}
+
+function decryptWord() {
+    let encrypted = document.getElementById('word').value.replace(/\s+/g, ''); // Remove spaces
+    const halfLength = Math.ceil(encrypted.length / 2);
+    const evenPart = encrypted.slice(0, halfLength);
+    const oddPart = encrypted.slice(halfLength);
+    let decryptedWord = '';
+    for (let i = 0; i < encrypted.length; i++) {
+        decryptedWord += i % 2 === 0 ? evenPart[Math.floor(i / 2)] : oddPart[Math.floor(i / 2)];
+    }
+    document.getElementById('result').innerText = `Decrypted Word: ${decryptedWord}`;
+}
+
+function encryptWord() {
+    let word = document.getElementById('word').value.replace(/\s+/g, ''); // Remove spaces
+    const ciphered = cipherWord(word);
+    document.getElementById('result').innerText = `Ciphered Word: ${ciphered}`;
+}
+    </script>
+</body>
+</html>
